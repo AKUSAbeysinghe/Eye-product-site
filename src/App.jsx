@@ -3,25 +3,40 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Home from "./components/Pages/Home";
+import Shop from "./components/selectionHeader.jsx"
 
-import Suppliment from "./components/Pages/Suppliment.jsx";
+import Atelier from "./components/Pages/Atelier.jsx";
 import Footer from "./components/Footer";
-import About from "./components/Ourstory";
+import About from "./components/Pages/About.jsx";
 
-import PrivacyPolicy from "./components/Pages/Privacy";
+import Policies from "./components/Pages/Policies.jsx";
 import TermsOfService from "./components/Pages/Terms.jsx";
-import FAQ from "./components/Pages/FAQ.jsx";
-import Parmacy from "./components/Pages/parmacy.jsx";
-import Fitness from "./components/Pages/fitness.jsx";
-import Contact from "./components/Pages/Contact.jsx";
+import Questions from "./components/Pages/Questions.jsx";
+import EyeExams from "./components/Pages/EyeExams.jsx";
+import Journal from "./components/Pages/Journal.jsx";
+import Visit from "./components/Pages/Visit.jsx";
+
+
+
+
 
 // ✅ Admin Pages
 import Login from "./Admin/Login.jsx";
 import SignUp from "./Admin/SignUp.jsx";
 import AdminPanel from "./Admin/AdminPanel.jsx";
 
+
 // ✅ Import ScrollToTop
 import ScrollToTop from "./components/ScrollToTop.jsx";
+import Eyeglasses from "./components/Pages/EyeGlass.jsx";
+import Sunglasses from "./components/Pages/Sunglasses.jsx";
+import ContactLenses from "./components/Pages/ContactLenses.jsx";
+import LenseSolutions from "./components/Pages/LensSolutions.jsx";
+import Accessories from "./components/Pages/Accessories.jsx";
+import EyeCareServices from "./components/Pages/EyeCareServices.jsx";
+import Brands from "./components/Pages/Brands.jsx";
+
+
 
 // ✅ Smart Layout
 function Layout({ children }) {
@@ -63,15 +78,23 @@ function App() {
       <Routes>
         {/* Customer Pages */}
         <Route path="/" element={<Layout><Home /></Layout>} />
-        <Route path="/Supplements" element={<Layout><Suppliment /></Layout>} />
-        <Route path="/Fitness" element={<Layout><Fitness /></Layout>} />
+        <Route path="/shop" element={<Layout><Shop /></Layout>} />
+        <Route path="/atelier" element={<Layout><Atelier /></Layout>} />
+        <Route path="/journal" element={<Layout><Journal/></Layout>} />
         <Route path="/about" element={<Layout><About /></Layout>} />
+        <Route path="/eyeglasses" element={<Layout><Eyeglasses /></Layout>} />
+        <Route path="/sunglasses" element={<Layout><Sunglasses /></Layout>} />
+        <Route path="/contact-lenses" element={<Layout><ContactLenses/></Layout>} />
+        <Route path="/lens-solutions" element={<Layout><LenseSolutions/></Layout>} />
+         <Route path="/accessories" element={<Layout><Accessories /></Layout>} />
+        <Route path="/eye-care-services" element={<Layout><EyeCareServices/></Layout>} />
+        <Route path="/brands" element={<Layout><Brands/></Layout>} />
 
-        <Route path="/privacy-policy" element={<Layout><PrivacyPolicy /></Layout>} />
+        <Route path="/policies" element={<Layout><Policies /></Layout>} />
         <Route path="/terms-of-service" element={<Layout><TermsOfService /></Layout>} />
-        <Route path="/FAQ" element={<Layout><FAQ /></Layout>} />
-        <Route path="/pharmacy" element={<Layout><Parmacy /></Layout>} />
-        <Route path="/contact" element={<Layout><Contact /></Layout>} />
+        <Route path="/Questions" element={<Layout><Questions /></Layout>} />
+        <Route path="/eye-exams" element={<Layout><EyeExams/></Layout>} />
+        <Route path="/visit" element={<Layout><Visit /></Layout>} />
 
         {/* Admin Pages */}
         <Route path="/signup" element={<Layout><SignUp /></Layout>} />

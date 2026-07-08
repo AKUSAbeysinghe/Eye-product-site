@@ -1,84 +1,53 @@
 import React from 'react';
-import Mains from '../assets/Mains/Banner.png';
+import MainBannerImage from "../assets/Mains/CoupleWithGlasses.jpg";
 
-const HeroSection = () => {
-  const whatsappNumber = "919876543210"; // ← Change to your actual WhatsApp number
 
-  const openWhatsApp = (message = "") => {
-    const encodedMessage = encodeURIComponent(message);
-    const url = encodedMessage 
-      ? `https://wa.me/${whatsappNumber}?text=${encodedMessage}` 
-      : `https://wa.me/${whatsappNumber}`;
-    window.open(url, '_blank');
-  };
-
+export default function EditorialHero() {
   return (
-    <section className="relative min-h-screen bg-[#FCFAF7] px-8 py-20 overflow-hidden">
-
-      {/* Blurred Background Image */}
-      <div
-        className="absolute inset-0 bg-center bg-cover opacity-40 blur-xl scale-110"
-        style={{
-          backgroundImage: `url(${Mains})`,
-        }}
-      />
-
-      {/* Content */}
-      <div className="relative max-w-3xl mx-auto text-center">
-
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 border border-gray-200 rounded-full text-sm text-gray-700 bg-white shadow-sm">
-          <span>✨</span>
-          <span>Your wellness, simplified</span>
+    <section className="bg-[#f7f5f0] text-neutral-900 min-h-screen px-4 py-6 sm:px-8 sm:py-10 md:px-12 md:py-12 font-serif selection:bg-neutral-200">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* Top Header Meta Row */}
+        <div className="flex justify-between items-center text-[10px] sm:text-xs tracking-[0.2em] uppercase text-neutral-500 border-b border-neutral-200 pb-4 font-sans font-medium">
+          <div>Vol. XIV · Spring Edition</div>
+          <div className="absolute left-1/2 -translate-x-1/2 hidden md:block">Toronto</div>
+          <div>№ 042</div>
         </div>
 
-        {/* Heading */}
-        <h1 className="text-6xl font-semibold text-gray-900 leading-tight mb-6">
-          Health & wellness, <br />
-          <span className="text-[#2E7D56]">
-            all in one place.
-          </span>
-        </h1>
-
-        {/* Subtext */}
-        <p className="text-lg text-gray-600 mb-10 max-w-xl mx-auto">
-          From trusted pharmacies and premium supplements to modern fitness
-          clubs — Vivara connects you with everything you need to feel your best.
-        </p>
-
-        {/* Buttons */}
-        <div className="flex items-center justify-center gap-4 mb-10">
-          {/* Primary Button */}
-          <button 
-            onClick={() => openWhatsApp("Hi, I'm interested in exploring wellness services.")}
-            className="flex items-center gap-2 px-6 py-3 bg-[#2E7D56] text-white rounded-full font-medium hover:bg-[#256a47] transition-all"
-          >
-            Explore wellness <span>→</span>
-          </button>
-
-          {/* Secondary Button */}
-          <button 
-            onClick={() => openWhatsApp("Hi, I'm interested in becoming a partner with Vivara.")}
-            className="px-6 py-3 bg-[#F0EFE9] text-gray-800 rounded-full font-medium hover:bg-[#e4e2da] transition-all"
-          >
-            For partners
-          </button>
+        {/* Mobile-only location layout adjustments */}
+        <div className="text-[10px] tracking-[0.2em] uppercase text-neutral-500 text-center pt-2 block md:hidden font-sans font-medium">
+          Toronto
         </div>
 
-        {/* Trust Indicator */}
-        <div className="flex items-center justify-center gap-3">
-          <div className="flex text-orange-400 text-xl">
-            ★★★★★
+        {/* Main Dramatic Headline */}
+        <div className="mt-8 mb-8 md:mt-12 md:mb-12">
+          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-normal tracking-tight text-neutral-950 leading-none">
+            Seen, precisely.
+          </h1>
+        </div>
+
+        {/* Split Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start mt-6">
+          
+          {/* Left Side: Curated Portrait Image */}
+          <div className="md:col-span-7 overflow-hidden rounded-sm bg-neutral-200 aspect-[4/3] md:aspect-[16/11]">
+            <img 
+              src={MainBannerImage}
+              alt="Close up of clear framed luxury optical glasses" 
+              className="w-full h-full object-cover object-center scale-105"
+            />
           </div>
 
-          <span className="text-gray-600 font-medium">
-            Trusted by <span className="font-bold">2M+</span> members worldwide
-          </span>
+          {/* Right Side: Editorial Body Copy */}
+          <div className="md:col-span-5 md:pl-4 flex flex-col justify-center h-full">
+            <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal text-neutral-950 leading-[1.25] tracking-tight">
+              An independent optical house pairing curated frames with comprehensive eye care — under one roof, by appointment.
+            </p>
+          </div>
+
         </div>
 
       </div>
     </section>
   );
-};
-
-export default HeroSection;
+}

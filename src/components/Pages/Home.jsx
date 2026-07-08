@@ -1,23 +1,36 @@
 import React from "react";
-import Banner from "./../Banner";
-import About from "./../Ourstory";
-import Suppliments from "./../SupplimentsSection";
-import Parmacy from "./../ParmacySection";
-import Fitness from "./../FitnessSection";
-import PartnerCTA from "../Partnership";
-
+// import SelectionHeader from "./../selectionHeader";
 import Hero from "../Hero";
+import OpticalFeature from "../OpticalFeatures";
+import EditorialRibon from "../EditorialRibon";
+import EditorialCollections from "../EditorialCollection";
+import CollectionNext from "../Collectionnext";
+// import GalaryPair from "../GalaryPair";
+// import ProductGrid from "../ProductsGrid";
+
+import EyeExamforHome from "../Pages/EyeExams";
+import JourneyForHome from "../JournalForHome";
+import History from "../Pages/History";
 
 const Home = () => {
   return (
     <>
       <Hero/>
-      <Banner />
-      <About />
-      <Parmacy/>
-      <Suppliments/>
-      <Fitness/>
-      <PartnerCTA/>
+      <OpticalFeature/>
+      <EditorialRibon/>
+      <EditorialCollections/>
+      <CollectionNext/>
+      <EyeExamforHome/>
+      <JourneyForHome/>
+      {/* <GalaryPair/>
+      <ProductGrid/> */}
+      {/* <SelectionHeader/> */}
+ 
+      <History/>
+      
+ 
+      
+      
       
       
     </>
