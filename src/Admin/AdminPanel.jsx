@@ -372,7 +372,6 @@
 // export default AdminPanel;
 
 
-
 import React, { useEffect, useState } from "react";
 
 const AdminPanel = () => {
@@ -403,11 +402,11 @@ const AdminPanel = () => {
 
   const [admin] = useState({
     name: "Admin",
-    email: "admin@aperture.optic",
+    email: "admin@apertureoptic.com",
     profilePic: "https://i.pravatar.cc/100?img=25",
   });
 
-  // Fetch functions remain the same...
+  // Fetch functions (unchanged logic)
   const fetchCategories = async () => {
     try {
       const res = await fetch("http://localhost/Eye-products-DB/api/get_categories.php");
@@ -460,6 +459,7 @@ const AdminPanel = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked
@@ -474,206 +474,366 @@ const AdminPanel = () => {
     }
   };
 
-  const handleSubmit = async (e) => { /* ... same as before ... */ };
-  const resetForm = () => { /* ... same ... */ };
-  const handleEdit = (product) => { /* ... same ... */ };
-  const confirmDelete = (id) => { /* ... same ... */ };
-  const handleDelete = async () => { /* ... same ... */ };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
+    setError("");
+    setIsSubmitting(true);
+
+    if (!formData.name || !formData.price || !formData.category_id || !formData.sub_category_id) {
+      setError("⚠️ Name, Price, Category, and Subcategory are required.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const formDataToSend = new FormData();
+    Object.keys(formData).forEach((key) => {
+      if (formData[key] !== null && formData[key] !== undefined) {
+        formDataToSend.append(key, formData[key]);
+      }
+    });
+
+    if (isEditing) formDataToSend.append("id", editId);
+
+    try {
+      const url = isEditing
+        ? "http://localhost/Eye-products-DB/api/update_product.php"
+        : "http://localhost/Eye-products-DB/api/add_product.php";
+
+      const res = await fetch(url, { method: "POST", body: formDataToSend });
+      const result = await res.json();
+
+      if (result.success) {
+        setMessage(isEditing ? "✅ Product updated successfully" : "✅ Product added successfully");
+        setShowForm(false);
+        resetForm();
+        fetchProducts();
+      } else {
+        setError(result.message || "Failed to save");
+      }
+    } catch (err) {
+      setError("Server error occurred");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      category_id: categories.length > 0 ? categories[0].id : "",
+      sub_category_id: "",
+      name: "",
+      price: "",
+      description: "",
+      image: null,
+      popular: false,
+      stock: 0,
+    });
+    setIsEditing(false);
+    setEditId(null);
+  };
+
+  const handleEdit = (product) => {
+    setFormData({
+      category_id: product.category_id,
+      sub_category_id: product.sub_category_id,
+      name: product.name,
+      price: product.price,
+      description: product.description || "",
+      image: null,
+      popular: Boolean(product.popular),
+      stock: product.stock || 0,
+    });
+    fetchSubCategories(product.category_id);
+    setIsEditing(true);
+    setEditId(product.id);
+    setShowForm(true);
+  };
+
+  const confirmDelete = (id) => {
+    setItemToDelete(id);
+    setShowConfirmModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+    try {
+      const res = await fetch("http://localhost/Eye-products-DB/api/delete_product.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `id=${itemToDelete}`,
+      });
+      const result = await res.json();
+      if (result.success) {
+        setMessage("✅ Product deleted successfully");
+        setProducts(prev => prev.filter(p => p.id !== itemToDelete));
+      }
+    } catch (err) {
+      setError("Delete failed");
+    } finally {
+      setShowConfirmModal(false);
+      setItemToDelete(null);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#fbf9f6] font-sans text-[#111111] p-6 md:p-12">
-      {/* Header - unchanged */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-        <div className="flex items-center gap-6">
-          <img 
-            src={admin.profilePic} 
-            alt="admin" 
-            className="w-20 h-20 rounded-full border-4 border-[#111111]" 
-          />
-          <div>
-            <h1 className="text-4xl font-serif tracking-tight">{admin.name}</h1>
-            <p className="text-gray-600 text-lg">{admin.email}</p>
-            <p className="text-xs uppercase tracking-[0.25em] text-gray-500 mt-1">APERTURE OPTIC • ADMIN</p>
+    <div className="min-h-screen bg-[#fbf9f6] font-sans text-[#222222]">
+      {/* Header - Matching Navbar Style */}
+      <div className="bg-white border-b border-gray-200/50 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-6 flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <img 
+              src={admin.profilePic} 
+              alt="admin" 
+              className="w-16 h-16 rounded-full border-2 border-[#222222]" 
+            />
+            <div>
+              <h1 className="text-3xl font-serif tracking-tight">{admin.name}</h1>
+              <p className="text-[#444444] text-sm">{admin.email}</p>
+            </div>
+          </div>
+          
+          <div className="text-right">
+            <p className="font-serif italic text-xl tracking-tight">Aperture Optic</p>
+            <p className="text-xs tracking-[0.2em] text-[#444444]">ADMIN PANEL</p>
           </div>
         </div>
       </div>
 
-      {/* Messages */}
-      {message && <div className="mb-8 p-5 bg-green-50 border border-green-200 text-green-800 rounded-2xl">{message}</div>}
-      {error && <div className="mb-8 p-5 bg-red-50 border border-red-200 text-red-800 rounded-2xl">{error}</div>}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-10">
+        {/* Messages */}
+        {message && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded-xl text-center">
+            {message}
+          </div>
+        )}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-center">
+            {error}
+          </div>
+        )}
 
-      <div className="mb-10">
-        <button
-          onClick={() => { resetForm(); setShowForm(true); }}
-          className="bg-[#111111] hover:bg-black text-white px-10 py-4 rounded-full font-medium tracking-wider text-sm transition-all duration-200 flex items-center gap-3"
-        >
-          <span>+</span> ADD NEW PRODUCT
-        </button>
-      </div>
-
-      {/* Products Table - unchanged */}
-      <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
-        {/* ... table remains the same ... */}
-        <div className="p-8 border-b border-gray-100">
+        <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-serif tracking-tight">All Products</h2>
+          <button
+            onClick={() => { resetForm(); setShowForm(true); }}
+            className="border border-black px-8 py-3.5 text-xs font-medium tracking-[0.2em] hover:bg-black hover:text-[#fbf9f6] transition-all duration-300"
+          >
+            + ADD NEW PRODUCT
+          </button>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            {/* Table content remains unchanged */}
-            {/* ... (keep your existing table code) ... */}
-          </table>
+
+        {/* Products Table */}
+        <div className="bg-white border border-gray-200/50 rounded-xl overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-[#fbf9f6] border-b border-gray-200">
+                <tr>
+                  <th className="p-5 text-left text-xs font-medium tracking-widest text-[#444444]">IMAGE</th>
+                  <th className="p-5 text-left text-xs font-medium tracking-widest text-[#444444]">PRODUCT</th>
+                  <th className="p-5 text-left text-xs font-medium tracking-widest text-[#444444]">CATEGORY</th>
+                  <th className="p-5 text-left text-xs font-medium tracking-widest text-[#444444]">SUBCATEGORY</th>
+                  <th className="p-5 text-left text-xs font-medium tracking-widest text-[#444444]">PRICE</th>
+                  <th className="p-5 text-left text-xs font-medium tracking-widest text-[#444444]">STOCK</th>
+                  <th className="p-5 text-left text-xs font-medium tracking-widest text-[#444444]">POPULAR</th>
+                  <th className="p-5 text-left text-xs font-medium tracking-widest text-[#444444]">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {products.length === 0 ? (
+                  <tr>
+                    <td colSpan="8" className="p-16 text-center text-[#666666]">
+                      No products yet
+                    </td>
+                  </tr>
+                ) : (
+                  products.map((product) => (
+                    <tr key={product.id} className="hover:bg-[#fbf9f6] transition-colors">
+                      <td className="p-5">
+                        <img
+                          src={
+                            product.image_url
+                              ? `http://localhost/Eye-products-DB/${product.image_url}`
+                              : "https://via.placeholder.com/80x80?text=No+Image"
+                          }
+                          alt={product.name}
+                          className="w-16 h-16 object-cover rounded-lg border border-gray-100"
+                          onError={(e) => { e.target.src = "https://via.placeholder.com/80x80?text=Failed"; }}
+                        />
+                      </td>
+                      <td className="p-5 font-medium">{product.name}</td>
+                      <td className="p-5 text-[#444444]">{product.category_name || "—"}</td>
+                      <td className="p-5 text-[#444444]">{product.sub_category_name || "—"}</td>
+                      <td className="p-5 font-semibold">Rs. {Number(product.price).toLocaleString("en-LK")}</td>
+                      <td className="p-5">{product.stock}</td>
+                      <td className="p-5">
+                        <span className={`inline-block px-3 py-1 text-xs rounded-full ${product.popular ? 'bg-black text-white' : 'bg-gray-100 text-gray-500'}`}>
+                          {product.popular ? "Yes" : "No"}
+                        </span>
+                      </td>
+                      <td className="p-5 space-x-3">
+                        <button
+                          onClick={() => handleEdit(product)}
+                          className="border border-black px-5 py-2 text-xs hover:bg-black hover:text-white transition-all"
+                        >
+                          EDIT
+                        </button>
+                        <button
+                          onClick={() => confirmDelete(product.id)}
+                          className="border border-red-600 text-red-600 px-5 py-2 text-xs hover:bg-red-600 hover:text-white transition-all"
+                        >
+                          DELETE
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      {/* ==================== FIXED MODAL ==================== */}
+      {/* Add/Edit Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4 overflow-y-auto">
-          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl my-8 max-h-[92vh] overflow-hidden flex flex-col">
-            
-            {/* Modal Header */}
-            <div className="px-8 pt-8 pb-4 border-b">
-              <h3 className="text-3xl font-serif tracking-tight">
-                {isEditing ? "Edit Product" : "Add New Product"}
-              </h3>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white border border-gray-200 w-full max-w-lg rounded-2xl p-10 shadow-2xl"
+          >
+            <h3 className="text-3xl font-serif tracking-tight mb-8 text-center">
+              {isEditing ? "Edit Product" : "New Product"}
+            </h3>
+
+            <select
+              name="category_id"
+              value={formData.category_id}
+              onChange={handleChange}
+              className="w-full p-4 mb-4 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+              required
+            >
+              <option value="">Select Category</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+
+            <select
+              name="sub_category_id"
+              value={formData.sub_category_id}
+              onChange={handleChange}
+              className="w-full p-4 mb-4 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+              required
+            >
+              <option value="">Select Subcategory</option>
+              {subCategories.map(sub => (
+                <option key={sub.id} value={sub.id}>{sub.name}</option>
+              ))}
+            </select>
+
+            <input
+              type="text"
+              name="name"
+              placeholder="Product Name"
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full p-4 mb-4 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+              required
+            />
+
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-xs tracking-widest mb-2 text-[#444444]">PRICE (Rs.)</label>
+                <input
+                  type="number"
+                  name="price"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs tracking-widest mb-2 text-[#444444]">STOCK</label>
+                <input
+                  type="number"
+                  name="stock"
+                  value={formData.stock}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                />
+              </div>
             </div>
 
-            {/* Scrollable Form Body */}
-            <form 
-              onSubmit={handleSubmit} 
-              className="flex-1 overflow-y-auto p-8 space-y-6"
-            >
-              <select 
-                name="category_id" 
-                value={formData.category_id} 
-                onChange={handleChange} 
-                className="w-full p-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-black"
-                required
-              >
-                <option value="">Select Category</option>
-                {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
-              </select>
+            <textarea
+              name="description"
+              placeholder="Description"
+              value={formData.description}
+              onChange={handleChange}
+              className="w-full p-4 mb-6 border border-gray-300 rounded-xl h-28 focus:outline-none focus:border-black"
+            />
 
-              <select 
-                name="sub_category_id" 
-                value={formData.sub_category_id} 
-                onChange={handleChange} 
-                className="w-full p-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-black"
-                required
-              >
-                <option value="">Select Subcategory</option>
-                {subCategories.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
-              </select>
-
-              <input 
-                type="text" 
-                name="name" 
-                placeholder="Product Name" 
-                value={formData.name} 
-                onChange={handleChange} 
-                className="w-full p-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-black" 
-                required 
+            <div className="flex items-center gap-3 mb-6">
+              <input
+                type="checkbox"
+                name="popular"
+                checked={formData.popular}
+                onChange={handleChange}
+                className="w-5 h-5 accent-black"
               />
+              <label className="text-sm">Mark as Popular</label>
+            </div>
 
-              <div className="grid grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-xs tracking-widest text-gray-500 mb-2">PRICE (Rs.)</label>
-                  <input 
-                    type="number" 
-                    name="price" 
-                    step="0.01" 
-                    value={formData.price} 
-                    onChange={handleChange} 
-                    className="w-full p-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-black" 
-                    required 
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs tracking-widest text-gray-500 mb-2">STOCK</label>
-                  <input 
-                    type="number" 
-                    name="stock" 
-                    value={formData.stock} 
-                    onChange={handleChange} 
-                    className="w-full p-4 border border-gray-200 rounded-2xl focus:outline-none focus:border-black" 
-                  />
-                </div>
-              </div>
-
-              <textarea 
-                name="description" 
-                placeholder="Description (optional)" 
-                value={formData.description} 
-                onChange={handleChange} 
-                className="w-full p-4 border border-gray-200 rounded-2xl h-28 focus:outline-none focus:border-black" 
+            <div className="mb-8">
+              <label className="block text-xs tracking-widest mb-2 text-[#444444]">PRODUCT IMAGE</label>
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleChange}
+                className="w-full text-sm"
               />
+            </div>
 
-              <div className="flex items-center gap-3">
-                <input 
-                  type="checkbox" 
-                  name="popular" 
-                  checked={formData.popular} 
-                  onChange={handleChange} 
-                  className="w-5 h-5 accent-black"
-                />
-                <label>Mark as Popular</label>
-              </div>
-
-              <div>
-                <label className="block text-xs tracking-widest text-gray-500 mb-3">PRODUCT IMAGE</label>
-                <input 
-                  type="file" 
-                  name="image" 
-                  accept="image/*" 
-                  onChange={handleChange} 
-                  className="w-full text-sm file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:bg-gray-100 file:text-sm hover:file:bg-gray-200"
-                />
-              </div>
-            </form>
-
-            {/* Modal Footer */}
-            <div className="p-8 border-t flex justify-end gap-4 bg-white rounded-b-3xl">
-              <button 
-                type="button" 
-                onClick={() => setShowForm(false)} 
-                className="px-8 py-4 border border-gray-300 rounded-2xl hover:bg-gray-100 transition-colors"
+            <div className="flex justify-end gap-4">
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="px-8 py-3 border border-gray-300 hover:bg-gray-100 transition-all"
               >
                 Cancel
               </button>
-              <button 
-                type="submit" 
-                form="productForm" 
-                disabled={isSubmitting} 
-                onClick={(e) => {
-                  const form = e.currentTarget.form;
-                  if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
-                }}
-                className="px-10 py-4 bg-[#111111] text-white rounded-2xl hover:bg-black transition-colors disabled:opacity-70"
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-10 py-3 border border-black bg-black text-white hover:bg-white hover:text-black transition-all font-medium"
               >
-                {isSubmitting ? "Saving..." : isEditing ? "Update" : "Add Product"}
+                {isSubmitting ? "SAVING..." : isEditing ? "UPDATE PRODUCT" : "ADD PRODUCT"}
               </button>
             </div>
-          </div>
+          </form>
         </div>
       )}
 
-      {/* Delete Modal - unchanged */}
+      {/* Delete Confirmation Modal */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-6">
-          <div className="bg-white rounded-3xl p-10 max-w-sm w-full text-center">
-            <h3 className="text-2xl font-serif mb-4">Delete Product?</h3>
-            <p className="text-gray-600 mb-8">This action cannot be undone.</p>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-white border border-gray-200 rounded-2xl p-10 max-w-sm w-full text-center">
+            <h3 className="text-2xl font-serif mb-4">Confirm Delete</h3>
+            <p className="mb-8 text-[#444444]">Are you sure you want to delete this product?</p>
             <div className="flex justify-center gap-4">
-              <button 
-                onClick={() => setShowConfirmModal(false)} 
-                className="px-8 py-4 border border-gray-300 rounded-2xl hover:bg-gray-100"
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="px-8 py-3 border border-gray-300 hover:bg-gray-100 transition-all"
               >
                 Cancel
               </button>
-              <button 
-                onClick={handleDelete} 
-                className="px-8 py-4 bg-red-600 text-white rounded-2xl hover:bg-red-700"
+              <button
+                onClick={handleDelete}
+                className="px-8 py-3 bg-red-600 text-white hover:bg-red-700 transition-all"
               >
-                Yes, Delete
+                Delete
               </button>
             </div>
           </div>
